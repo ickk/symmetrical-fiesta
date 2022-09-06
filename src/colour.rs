@@ -1,6 +1,6 @@
 use crate::math::*;
-use std::ops::{Sub, Add, Mul};
 use image::Rgb;
+use std::ops::{Add, Mul, Sub};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Colour {
@@ -15,15 +15,14 @@ impl From<Colour> for Rgb<u8> {
       (colour.red.clamp(0.0, 1.0) * 255.0).round() as u8,
       (colour.green.clamp(0.0, 1.0) * 255.0).round() as u8,
       (colour.blue.clamp(0.0, 1.0) * 255.0).round() as u8,
-    ].into()
+    ]
+    .into()
   }
 }
 
 impl ApproxEq for Colour {
   fn approx_eq(self, rhs: Colour) -> bool {
-    self.red.approx_eq(rhs.red)
-    && self.green.approx_eq(rhs.green)
-    && self.blue.approx_eq(rhs.blue)
+    self.red.approx_eq(rhs.red) && self.green.approx_eq(rhs.green) && self.blue.approx_eq(rhs.blue)
   }
 }
 
@@ -94,10 +93,26 @@ impl Mul<Colour> for Colour {
 }
 
 impl Colour {
-  pub const BLACK: Colour = Colour { red: 0.0, green: 0.0, blue: 0.0 };
-  pub const RED: Colour = Colour { red: 1.0, green: 0.0, blue: 0.0 };
-  pub const GREEN: Colour = Colour { red: 0.0, green: 1.0, blue: 0.0 };
-  pub const BLUE: Colour = Colour { red: 0.0, green: 0.0, blue: 1.0 };
+  pub const BLACK: Colour = Colour {
+    red: 0.0,
+    green: 0.0,
+    blue: 0.0,
+  };
+  pub const RED: Colour = Colour {
+    red: 1.0,
+    green: 0.0,
+    blue: 0.0,
+  };
+  pub const GREEN: Colour = Colour {
+    red: 0.0,
+    green: 1.0,
+    blue: 0.0,
+  };
+  pub const BLUE: Colour = Colour {
+    red: 0.0,
+    green: 0.0,
+    blue: 1.0,
+  };
 
   pub fn hadamard_product(self, rhs: Colour) -> Colour {
     Colour {
@@ -131,7 +146,11 @@ mod tests {
     let colour_a: Colour = (0.9, 0.6, 0.75).into();
     let colour_b: Colour = (0.7, 0.1, 0.25).into();
     let result = colour_a + colour_b;
-    let expected = Colour { red: 1.6, green: 0.7, blue: 1.0 };
+    let expected = Colour {
+      red: 1.6,
+      green: 0.7,
+      blue: 1.0,
+    };
     assert!(result.approx_eq(expected));
   }
 
@@ -140,7 +159,11 @@ mod tests {
     let colour_a: Colour = (0.9, 0.6, 0.75).into();
     let colour_b: Colour = (0.7, 0.1, 0.25).into();
     let result = colour_a - colour_b;
-    let expected = Colour { red: 0.2, green: 0.5, blue: 0.5 };
+    let expected = Colour {
+      red: 0.2,
+      green: 0.5,
+      blue: 0.5,
+    };
     assert!(result.approx_eq(expected));
   }
 
@@ -149,7 +172,11 @@ mod tests {
     // scalar on the right
     let colour: Colour = (0.2, 0.3, 0.4).into();
     let result = colour * 2.0;
-    let expected = Colour { red: 0.4, green: 0.6, blue: 0.8 };
+    let expected = Colour {
+      red: 0.4,
+      green: 0.6,
+      blue: 0.8,
+    };
     assert!(result.approx_eq(expected));
 
     // scalar on the left
@@ -162,7 +189,11 @@ mod tests {
     let colour_a: Colour = (1.0, 0.2, 0.4).into();
     let colour_b: Colour = (0.9, 1.0, 0.1).into();
     let result = colour_a.hadamard_product(colour_b);
-    let expected = Colour { red: 0.9, green: 0.2, blue: 0.04 };
+    let expected = Colour {
+      red: 0.9,
+      green: 0.2,
+      blue: 0.04,
+    };
     assert!(result.approx_eq(expected));
 
     let result = colour_a * colour_b;
