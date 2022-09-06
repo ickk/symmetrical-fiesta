@@ -1,6 +1,17 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-type Tuple3 = (f32, f32, f32);
+pub type Tuple3 = (f32, f32, f32);
+
+pub trait ApproxEq {
+  fn approx_eq(self, rhs: Self) -> bool;
+}
+
+pub const EPSILON: f32 = 0.00001;
+impl ApproxEq for f32 {
+  fn approx_eq(self, rhs: f32) -> bool {
+    (self - rhs).abs() < EPSILON
+  }
+}
 
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
