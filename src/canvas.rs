@@ -1,5 +1,6 @@
 use crate::colour::Colour;
 use std::fmt::Write as _;
+use image::{ImageBuffer, RgbImage, Rgb};
 
 pub struct Canvas {
   pub width: usize,
@@ -66,6 +67,17 @@ impl Canvas {
     }
 
     Ok(string)
+  }
+
+  /// Returns the canvas as an ImageBuffer
+  pub fn to_image(&self) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let mut img: RgbImage = ImageBuffer::new(self.width as _, self.height as _);
+
+    img.pixels_mut().zip(&self.canvas).map(|(pixel, colour)| {
+      *pixel = (*colour).into();
+    }).count();
+
+    img
   }
 }
 

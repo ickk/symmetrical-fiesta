@@ -1,11 +1,22 @@
 use crate::math::*;
 use std::ops::{Sub, Add, Mul};
+use image::Rgb;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Colour {
   pub red: f32,
   pub green: f32,
   pub blue: f32,
+}
+
+impl From<Colour> for Rgb<u8> {
+  fn from(colour: Colour) -> Rgb<u8> {
+    [
+      (colour.red.clamp(0.0, 1.0) * 255.0).round() as u8,
+      (colour.green.clamp(0.0, 1.0) * 255.0).round() as u8,
+      (colour.blue.clamp(0.0, 1.0) * 255.0).round() as u8,
+    ].into()
+  }
 }
 
 impl ApproxEq for Colour {
