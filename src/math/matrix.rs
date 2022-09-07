@@ -4,7 +4,7 @@ use std::ops::{Index, IndexMut, Mul};
 // Matrix 2x2
 #[derive(Debug, Clone)]
 pub struct Matrix2x2 {
-  inner: Array2x2,
+  pub(super) inner: Array2x2,
 }
 
 impl From<Array2x2> for Matrix2x2 {
@@ -77,7 +77,7 @@ impl Matrix2x2 {
 // Matrix3x3
 #[derive(Debug, Clone)]
 pub struct Matrix3x3 {
-  inner: Array3x3,
+  pub(super) inner: Array3x3,
 }
 
 impl From<Array3x3> for Matrix3x3 {
@@ -186,7 +186,7 @@ impl Matrix3x3 {
 // Matrix 4x4
 #[derive(Debug, Clone)]
 pub struct Matrix4x4 {
-  inner: Array4x4,
+  pub(super) inner: Array4x4,
 }
 
 impl From<Array4x4> for Matrix4x4 {
@@ -276,9 +276,9 @@ impl Mul<Vector> for Matrix4x4 {
     assert!(0.0
       .approx_eq(self[3][0] * rhs.x + self[3][1] * rhs.y + self[3][2] * rhs.z + self[3][3] * 0.0));
     Vector {
-      x: self[0][0] * rhs.x + self[0][1] * rhs.y + self[0][2] * rhs.z + self[0][3] * 1.0,
-      y: self[1][0] * rhs.x + self[1][1] * rhs.y + self[1][2] * rhs.z + self[1][3] * 1.0,
-      z: self[2][0] * rhs.x + self[2][1] * rhs.y + self[2][2] * rhs.z + self[2][3] * 1.0,
+      x: self[0][0] * rhs.x + self[0][1] * rhs.y + self[0][2] * rhs.z,
+      y: self[1][0] * rhs.x + self[1][1] * rhs.y + self[1][2] * rhs.z,
+      z: self[2][0] * rhs.x + self[2][1] * rhs.y + self[2][2] * rhs.z,
     }
   }
 }
@@ -498,7 +498,7 @@ mod tests {
     ].into();
     let vector: Vector = (1.0, 2.0, 3.0).into();
     let result = matrix * vector;
-    let expected: Vector = (18.0, 24.0, 33.0).into();
+    let expected: Vector = (14.0, 22.0, 32.0).into(); // no translation
     assert!(result.approx_eq(expected));
   }
 

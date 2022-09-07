@@ -1,9 +1,11 @@
 pub mod matrix;
 pub mod point;
+pub mod transformation;
 pub mod vector;
 
 pub use matrix::*;
 pub use point::*;
+pub use transformation::*;
 pub use vector::*;
 
 pub type Tuple3 = (f32, f32, f32);
