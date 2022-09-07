@@ -21,7 +21,7 @@ impl From<Colour> for Rgb<u8> {
 }
 
 impl ApproxEq for Colour {
-  fn approx_eq(self, rhs: Colour) -> bool {
+  fn approx_eq(&self, rhs: Colour) -> bool {
     self.red.approx_eq(rhs.red) && self.green.approx_eq(rhs.green) && self.blue.approx_eq(rhs.blue)
   }
 }

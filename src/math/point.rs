@@ -9,6 +9,12 @@ pub struct Point {
   pub z: f32,
 }
 
+impl ApproxEq for Point {
+  fn approx_eq(&self, rhs: Point) -> bool {
+    self.x.approx_eq(rhs.x) && self.y.approx_eq(rhs.y) && self.z.approx_eq(rhs.z)
+  }
+}
+
 /// Construct a Point from a tuple
 impl From<Tuple3> for Point {
   fn from(tuple: Tuple3) -> Point {

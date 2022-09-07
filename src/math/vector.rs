@@ -9,6 +9,12 @@ pub struct Vector {
   pub z: f32,
 }
 
+impl ApproxEq for Vector {
+  fn approx_eq(&self, rhs: Vector) -> bool {
+    self.x.approx_eq(rhs.x) && self.y.approx_eq(rhs.y) && self.z.approx_eq(rhs.z)
+  }
+}
+
 /// Construct a Vector from a tuple
 impl From<Tuple3> for Vector {
   fn from(tuple: Tuple3) -> Vector {
