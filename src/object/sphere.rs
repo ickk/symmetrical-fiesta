@@ -54,6 +54,10 @@ impl Object for Sphere {
       .mul_vec_unchecked(object_normal);
     world_normal.normalise()
   }
+
+  fn material(&self) -> &Material {
+    &self.material
+  }
 }
 
 #[cfg(test)]

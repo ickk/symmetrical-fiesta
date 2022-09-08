@@ -1,7 +1,7 @@
 pub mod sphere;
 pub use sphere::*;
 
-use crate::math::*;
+use crate::*;
 
 use itertools::Itertools;
 use std::{fmt::Debug, ops::Index};
@@ -10,6 +10,8 @@ pub trait Object: Debug {
   fn intersect(&self, ray: Ray) -> IntersectionCollection;
 
   fn normal_at(&self, point: Point) -> Vector;
+
+  fn material(&self) -> &Material;
 }
 
 #[derive(Debug, Clone, Copy)]

@@ -24,7 +24,7 @@ impl Default for Material {
 impl Material {
   pub fn lighting(
     &self,
-    light: PointLight,
+    light: &PointLight,
     position: Point,
     eye_vector: Vector,
     normal_vector: Vector,
@@ -81,7 +81,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(light, position, eye_vector, normal_vector);
+    let result = material.lighting(&light, position, eye_vector, normal_vector);
     let expected = Colour::from((1.9, 1.9, 1.9));
 
     assert!(result.approx_eq(expected));
@@ -95,7 +95,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(light, position, eye_vector, normal_vector);
+    let result = material.lighting(&light, position, eye_vector, normal_vector);
     let expected = Colour::from((1.0, 1.0, 1.0));
 
     assert!(result.approx_eq(expected));
@@ -109,7 +109,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(light, position, eye_vector, normal_vector);
+    let result = material.lighting(&light, position, eye_vector, normal_vector);
     let expected = Colour::from((0.7364, 0.7364, 0.7364));
 
     assert!(result.approx_eq(expected));
@@ -123,7 +123,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(light, position, eye_vector, normal_vector);
+    let result = material.lighting(&light, position, eye_vector, normal_vector);
     let expected = Colour::from((1.6364, 1.6364, 1.6364));
 
     assert!(result.approx_eq(expected));
@@ -137,7 +137,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(light, position, eye_vector, normal_vector);
+    let result = material.lighting(&light, position, eye_vector, normal_vector);
     let expected = Colour::from((0.1, 0.1, 0.1));
 
     assert!(result.approx_eq(expected));
