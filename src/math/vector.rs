@@ -111,6 +111,44 @@ impl Div<f32> for Vector {
   }
 }
 
+impl Mul<&Vector> for &Matrix4x4 {
+  type Output = Vector;
+
+  fn mul(self, rhs: &Vector) -> Vector {
+    assert!(0.0
+      .approx_eq(self[3][0] * rhs.x + self[3][1] * rhs.y + self[3][2] * rhs.z + self[3][3] * 0.0));
+    Vector {
+      x: self[0][0] * rhs.x + self[0][1] * rhs.y + self[0][2] * rhs.z,
+      y: self[1][0] * rhs.x + self[1][1] * rhs.y + self[1][2] * rhs.z,
+      z: self[2][0] * rhs.x + self[2][1] * rhs.y + self[2][2] * rhs.z,
+    }
+  }
+}
+
+impl Mul<Vector> for &Matrix4x4 {
+  type Output = Vector;
+
+  fn mul(self, rhs: Vector) -> Vector {
+    self * &rhs
+  }
+}
+
+impl Mul<&Vector> for Matrix4x4 {
+  type Output = Vector;
+
+  fn mul(self, rhs: &Vector) -> Vector {
+    &self * rhs
+  }
+}
+
+impl Mul<Vector> for Matrix4x4 {
+  type Output = Vector;
+
+  fn mul(self, rhs: Vector) -> Vector {
+    &self * &rhs
+  }
+}
+
 impl Vector {
   pub fn magnitude(self) -> f32 {
     (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()

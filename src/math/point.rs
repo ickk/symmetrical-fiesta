@@ -1,6 +1,6 @@
 use super::*;
 
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, Mul};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
@@ -60,6 +60,48 @@ impl Sub<Vector> for Point {
       z: self.z - rhs.z,
     }
   }
+}
+
+impl Mul<&Point> for &Matrix4x4 {
+  type Output = Point;
+
+  fn mul(self, rhs: &Point) -> Point {
+    assert!(1.0
+      .approx_eq(self[3][0] * rhs.x + self[3][1] * rhs.y + self[3][2] * rhs.z + self[3][3] * 1.0));
+    Point {
+      x: self[0][0] * rhs.x + self[0][1] * rhs.y + self[0][2] * rhs.z + self[0][3] * 1.0,
+      y: self[1][0] * rhs.x + self[1][1] * rhs.y + self[1][2] * rhs.z + self[1][3] * 1.0,
+      z: self[2][0] * rhs.x + self[2][1] * rhs.y + self[2][2] * rhs.z + self[2][3] * 1.0,
+    }
+  }
+}
+
+impl Mul<Point> for &Matrix4x4 {
+  type Output = Point;
+
+  fn mul(self, rhs: Point) -> Point {
+    self * &rhs
+  }
+}
+
+impl Mul<&Point> for Matrix4x4 {
+  type Output = Point;
+
+  fn mul(self, rhs: &Point) -> Point {
+    &self * rhs
+  }
+}
+
+impl Mul<Point> for Matrix4x4 {
+  type Output = Point;
+
+  fn mul(self, rhs: Point) -> Point {
+    &self * &rhs
+  }
+}
+
+impl Point {
+  pub const ORIGIN: Self = Point { x: 0.0, y: 0.0, z: 0.0 };
 }
 
 #[cfg(test)]

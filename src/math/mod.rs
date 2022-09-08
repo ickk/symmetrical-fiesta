@@ -2,11 +2,13 @@ pub mod matrix;
 pub mod point;
 pub mod transformation;
 pub mod vector;
+pub mod ray;
 
 pub use matrix::*;
 pub use point::*;
 pub use transformation::*;
 pub use vector::*;
+pub use ray::*;
 
 pub type Tuple3 = (f32, f32, f32);
 pub type Array2 = [f32; 2];
@@ -20,7 +22,7 @@ pub trait ApproxEq {
   fn approx_eq(&self, rhs: Self) -> bool;
 }
 
-pub const EPSILON: f32 = 0.00001;
+pub const EPSILON: f32 = 0.000005;
 impl ApproxEq for f32 {
   fn approx_eq(&self, rhs: f32) -> bool {
     (self - rhs).abs() < EPSILON
