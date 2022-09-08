@@ -24,25 +24,24 @@ impl Object for Sphere {
     let b = 2.0 * ray.direction.dot(sphere_to_ray);
     let c = sphere_to_ray.dot(sphere_to_ray) - 1.0;
 
-    let discriminant = b*b - 4.0 * a * c;
+    let discriminant = b * b - 4.0 * a * c;
 
     if discriminant < 0.0 {
       vec![]
     } else {
       vec![
         Intersection {
-          t: -(discriminant.sqrt() + b) / (2.0*a),
+          t: -(discriminant.sqrt() + b) / (2.0 * a),
           object: self,
         },
         Intersection {
-          t: (discriminant.sqrt() - b) / (2.0*a),
+          t: (discriminant.sqrt() - b) / (2.0 * a),
           object: self,
         },
       ]
     }
   }
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -1,14 +1,14 @@
 pub mod matrix;
 pub mod point;
+pub mod ray;
 pub mod transformation;
 pub mod vector;
-pub mod ray;
 
 pub use matrix::*;
 pub use point::*;
+pub use ray::*;
 pub use transformation::*;
 pub use vector::*;
-pub use ray::*;
 
 pub type Tuple3 = (f32, f32, f32);
 pub type Array2 = [f32; 2];

@@ -1,6 +1,8 @@
+#![allow(clippy::op_ref)]
+
 use super::*;
 
-use std::ops::{Add, Sub, Mul};
+use std::ops::{Add, Mul, Sub};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
@@ -101,7 +103,11 @@ impl Mul<Point> for Matrix4x4 {
 }
 
 impl Point {
-  pub const ORIGIN: Self = Point { x: 0.0, y: 0.0, z: 0.0 };
+  pub const ORIGIN: Self = Point {
+    x: 0.0,
+    y: 0.0,
+    z: 0.0,
+  };
 }
 
 #[cfg(test)]

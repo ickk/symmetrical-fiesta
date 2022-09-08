@@ -1,3 +1,5 @@
+#![allow(clippy::op_ref)]
+
 use super::*;
 
 use std::ops::{Add, Div, Mul, Neg, Sub};
