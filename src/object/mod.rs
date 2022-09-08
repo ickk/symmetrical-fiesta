@@ -5,10 +5,10 @@ pub use sphere::*;
 use crate::math::*;
 
 use itertools::Itertools;
-use std::fmt::Debug;
+use std::{fmt::Debug, ops::Index};
 
 pub trait Object: Debug {
-  fn intersect(&self, ray: Ray) -> Vec<Intersection>;
+  fn intersect(&self, ray: Ray) -> IntersectionCollection;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -33,6 +33,10 @@ impl<'a> IntersectionCollection<'a> {
     IntersectionCollection { inner: vec }
   }
 
+  pub fn len(&self) -> usize {
+    self.inner.len()
+  }
+
   // this could be a binary search
   pub fn hit(&self) -> Option<&Intersection> {
     for intersection in &self.inner {
@@ -52,6 +56,14 @@ impl<'a> IntersectionCollection<'a> {
       }
       self.inner.swap(i, prev_i);
     }
+  }
+}
+
+impl<'a> Index<usize> for IntersectionCollection<'a> {
+  type Output = Intersection<'a>;
+
+  fn index(&self, index: usize) -> &Self::Output {
+    &self.inner[index]
   }
 }
 

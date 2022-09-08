@@ -15,7 +15,7 @@ impl Sphere {
 
 impl Object for Sphere {
   /// Returns the t values of the ray where it instersects with the Sphere
-  fn intersect(&self, ray: Ray) -> Vec<Intersection> {
+  fn intersect(&self, ray: Ray) -> IntersectionCollection {
     let ray = self.transform.inverse().unwrap() * ray;
 
     let sphere_to_ray = ray.origin - Point::ORIGIN;
@@ -27,9 +27,9 @@ impl Object for Sphere {
     let discriminant = b * b - 4.0 * a * c;
 
     if discriminant < 0.0 {
-      vec![]
+      IntersectionCollection::from_vec_unchecked(vec![])
     } else {
-      vec![
+      IntersectionCollection::from_vec_unchecked(vec![
         Intersection {
           t: -(discriminant.sqrt() + b) / (2.0 * a),
           object: self,
@@ -38,7 +38,7 @@ impl Object for Sphere {
           t: (discriminant.sqrt() - b) / (2.0 * a),
           object: self,
         },
-      ]
+      ])
     }
   }
 }

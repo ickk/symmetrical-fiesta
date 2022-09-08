@@ -156,7 +156,7 @@ impl Vector {
     (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
   }
 
-  pub fn norm(self) -> Vector {
+  pub fn normalise(self) -> Vector {
     (1.0 / self.magnitude()) * self
   }
 
@@ -291,7 +291,7 @@ mod tests {
   #[test]
   fn norm_of_vector() {
     let vector: Vector = (3.0, 4.0, 0.0).into();
-    let norm = vector.norm();
+    let norm = vector.normalise();
     let expected = Vector {
       x: 3.0 / 5.0,
       y: 4.0 / 5.0,
