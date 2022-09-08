@@ -16,6 +16,8 @@ impl Sphere {
 impl Object for Sphere {
   /// Returns the t values of the ray where it instersects with the Sphere
   fn intersect(&self, ray: Ray) -> Vec<Intersection> {
+    let ray = self.transform.inverse().unwrap() * ray;
+
     let sphere_to_ray = ray.origin - Point::ORIGIN;
 
     let a = ray.direction.dot(ray.direction);
@@ -115,5 +117,27 @@ mod tests {
 
     sphere.transform = transform.clone();
     assert!(matches!(sphere.transform, transform));
+  }
+
+  #[test]
+  fn intersect_scaled_sphere() {
+    let ray = Ray::new((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
+    let mut sphere = Sphere::new();
+    sphere.transform = Matrix4x4::scale(2.0, 2.0, 2.0);
+    let xs = sphere.intersect(ray);
+
+    assert_eq!(xs.len(), 2);
+    assert!(xs[0].t.approx_eq(3.0));
+    assert!(xs[1].t.approx_eq(7.0));
+  }
+
+  #[test]
+  fn intersect_translated_sphere() {
+    let ray = Ray::new((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
+    let mut sphere = Sphere::new();
+    sphere.transform = Matrix4x4::translation(5.0, 0.0, 0.0);
+    let xs = sphere.intersect(ray);
+
+    assert_eq!(xs.len(), 0);
   }
 }
