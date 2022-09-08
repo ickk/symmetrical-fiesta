@@ -1,14 +1,16 @@
-use super::*;
+use crate::*;
 
 #[derive(Debug)]
 pub struct Sphere {
   pub transform: Matrix4x4,
+  pub material: Material,
 }
 
 impl Sphere {
   pub fn new() -> Self {
     Sphere {
       transform: Matrix4x4::IDENTITY,
+      material: Material::default(),
     }
   }
 }
@@ -41,11 +43,23 @@ impl Object for Sphere {
       ])
     }
   }
+
+  /// Returns the normal vector of the surface sphere at the given point
+  fn normal_at(&self, point: Point) -> Vector {
+    let inverse_transform = &self.transform.inverse().unwrap();
+    let object_point = inverse_transform * point;
+    let object_normal = object_point - Point::ORIGIN;
+    let world_normal = inverse_transform
+      .transpose()
+      .mul_vec_unchecked(object_normal);
+    world_normal.normalise()
+  }
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::f32::consts::PI;
 
   #[test]
   fn ray_sphere_intersection() {
@@ -138,5 +152,109 @@ mod tests {
     let xs = sphere.intersect(ray);
 
     assert_eq!(xs.len(), 0);
+  }
+
+  #[test]
+  fn normal_on_x_axis() {
+    let sphere = Sphere::new();
+    let normal = sphere.normal_at(Point::from((1.0, 0.0, 0.0)));
+    let expected = Vector::from((1.0, 0.0, 0.0));
+    assert!(normal.approx_eq(expected));
+  }
+
+  #[test]
+  fn normal_on_y_axis() {
+    let sphere = Sphere::new();
+    let normal = sphere.normal_at(Point::from((0.0, 1.0, 0.0)));
+    let expected = Vector::from((0.0, 1.0, 0.0));
+    assert!(normal.approx_eq(expected));
+  }
+
+  #[test]
+  fn normal_on_z_axis() {
+    let sphere = Sphere::new();
+    let normal = sphere.normal_at(Point::from((0.0, 0.0, 1.0)));
+    let expected = Vector::from((0.0, 0.0, 1.0));
+    assert!(normal.approx_eq(expected));
+  }
+
+  #[test]
+  fn normal_nonaxial() {
+    let sphere = Sphere::new();
+    let normal = sphere.normal_at(Point::from((
+      1.0 / 3.0f32.sqrt(),
+      1.0 / 3.0f32.sqrt(),
+      1.0 / 3.0f32.sqrt(),
+    )));
+    let expected = Vector::from((
+      1.0 / 3.0f32.sqrt(),
+      1.0 / 3.0f32.sqrt(),
+      1.0 / 3.0f32.sqrt(),
+    ));
+    assert!(normal.approx_eq(expected));
+  }
+
+  #[test]
+  fn normal_is_unit_length() {
+    let sphere = Sphere::new();
+    let normal = sphere.normal_at(Point::from((
+      1.0 / 3.0f32.sqrt(),
+      1.0 / 3.0f32.sqrt(),
+      1.0 / 3.0f32.sqrt(),
+    )));
+    let expected = normal.normalise();
+    assert!(normal.approx_eq(expected));
+  }
+
+  #[test]
+  fn normal_translated_sphere() {
+    let mut sphere = Sphere::new();
+    sphere.transform = Matrix4x4::translation(0.0, 1.0, 0.0);
+
+    let normal = sphere.normal_at(Point::from((0.0, 1.70711, -0.70711)));
+    let expected = Vector::from((0.0, 0.70711, -0.70711));
+    assert!(normal.approx_eq(expected));
+  }
+
+  #[test]
+  fn normal_transform_sphere() {
+    let mut sphere = Sphere::new();
+    sphere.transform = Matrix4x4::scale(1.0, 0.5, 1.0) * Matrix4x4::rotation_z(PI / 5.0);
+
+    let normal = sphere.normal_at(Point::from((
+      0.0,
+      1.0 / 2.0f32.sqrt(),
+      -1.0 / 2.0f32.sqrt(),
+    )));
+    let expected = Vector::from((0.0, 0.97014, -0.24254));
+    assert!(normal.approx_eq(expected));
+  }
+
+  #[test]
+  #[allow(unused_variables)]
+  fn sphere_default_material() {
+    let sphere = Sphere::new();
+    let expected = Material::default();
+    assert!(matches!(sphere.material, expected));
+  }
+
+  #[test]
+  #[allow(unused_variables)]
+  fn assign_material_to_sphere() {
+    let mut sphere = Sphere::new();
+    let material = Material {
+      ambient: 1.0,
+      ..Default::default()
+    };
+    sphere.material = material;
+
+    let expected = Material {
+      colour: Colour::WHITE,
+      ambient: 1.0,
+      diffuse: 0.9,
+      specular: 0.9,
+      shininess: 200.0,
+    };
+    assert!(matches!(sphere.material, expected));
   }
 }

@@ -2,10 +2,14 @@
 
 pub mod canvas;
 pub mod colour;
+pub mod light;
+pub mod material;
 pub mod math;
 pub mod object;
 
 pub use canvas::*;
 pub use colour::*;
+pub use light::*;
+pub use material::*;
 pub use math::*;
 pub use object::*;

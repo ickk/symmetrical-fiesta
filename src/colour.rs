@@ -113,6 +113,15 @@ impl Colour {
     green: 0.0,
     blue: 1.0,
   };
+  pub const WHITE: Colour = Colour {
+    red: 1.0,
+    green: 1.0,
+    blue: 1.0,
+  };
+
+  pub fn new(red: f32, green: f32, blue: f32) -> Self {
+    Colour { red, green, blue }
+  }
 
   pub fn hadamard_product(self, rhs: Colour) -> Colour {
     Colour {

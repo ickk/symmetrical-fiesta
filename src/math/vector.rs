@@ -113,16 +113,13 @@ impl Div<f32> for Vector {
   }
 }
 
-impl Mul<&Vector> for &Matrix4x4 {
-  type Output = Vector;
-
-  fn mul(self, rhs: &Vector) -> Vector {
-    assert!(0.0
-      .approx_eq(self[3][0] * rhs.x + self[3][1] * rhs.y + self[3][2] * rhs.z + self[3][3] * 0.0));
+impl Matrix4x4 {
+  #[inline]
+  pub fn mul_vec_unchecked(&self, vector: Vector) -> Vector {
     Vector {
-      x: self[0][0] * rhs.x + self[0][1] * rhs.y + self[0][2] * rhs.z,
-      y: self[1][0] * rhs.x + self[1][1] * rhs.y + self[1][2] * rhs.z,
-      z: self[2][0] * rhs.x + self[2][1] * rhs.y + self[2][2] * rhs.z,
+      x: self[0][0] * vector.x + self[0][1] * vector.y + self[0][2] * vector.z,
+      y: self[1][0] * vector.x + self[1][1] * vector.y + self[1][2] * vector.z,
+      z: self[2][0] * vector.x + self[2][1] * vector.y + self[2][2] * vector.z,
     }
   }
 }
@@ -131,15 +128,10 @@ impl Mul<Vector> for &Matrix4x4 {
   type Output = Vector;
 
   fn mul(self, rhs: Vector) -> Vector {
-    self * &rhs
-  }
-}
+    assert!(0.0
+      .approx_eq(self[3][0] * rhs.x + self[3][1] * rhs.y + self[3][2] * rhs.z + self[3][3] * 0.0));
 
-impl Mul<&Vector> for Matrix4x4 {
-  type Output = Vector;
-
-  fn mul(self, rhs: &Vector) -> Vector {
-    &self * rhs
+    self.mul_vec_unchecked(rhs)
   }
 }
 
@@ -147,7 +139,7 @@ impl Mul<Vector> for Matrix4x4 {
   type Output = Vector;
 
   fn mul(self, rhs: Vector) -> Vector {
-    &self * &rhs
+    &self * rhs
   }
 }
 
@@ -170,6 +162,10 @@ impl Vector {
       y: self.z * rhs.x - self.x * rhs.z,
       z: self.x * rhs.y - self.y * rhs.x,
     }
+  }
+
+  pub fn reflect(self, normal: Vector) -> Vector {
+    self - normal * 2.0 * self.dot(normal)
   }
 }
 
@@ -326,6 +322,26 @@ mod tests {
       z: 1.0,
     };
     assert!(matches!(b_cross_a, expected));
+  }
+
+  #[test]
+  fn reflect_vector_45_degrees() {
+    let vector = Vector::from((1.0, -1.0, 0.0));
+    let normal = Vector::from((0.0, 1.0, 0.0));
+
+    let result = vector.reflect(normal);
+    let expected = Vector::from((1.0, 1.0, 0.0));
+    assert!(result.approx_eq(expected));
+  }
+
+  #[test]
+  fn reflect_vector_slanted() {
+    let vector = Vector::from((0.0, -1.0, 0.0));
+    let normal = Vector::from((1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0));
+
+    let result = vector.reflect(normal);
+    let expected = Vector::from((1.0, 0.0, 0.0));
+    assert!(result.approx_eq(expected));
   }
 }
 
