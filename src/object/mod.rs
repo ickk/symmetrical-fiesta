@@ -37,6 +37,10 @@ impl<'a> IntersectionCollection<'a> {
     self.inner.len()
   }
 
+  pub fn is_empty(&self) -> bool {
+    self.inner.is_empty()
+  }
+
   // this could be a binary search
   pub fn hit(&self) -> Option<&Intersection> {
     for intersection in &self.inner {

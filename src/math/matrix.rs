@@ -291,6 +291,7 @@ impl Matrix4x4 {
     inner: [[0.0; 4]; 4],
   };
 
+  #[inline]
   pub fn transpose(&self) -> Matrix4x4 {
     Matrix4x4 {
       inner: [
@@ -322,14 +323,17 @@ impl Matrix4x4 {
     output
   }
 
+  #[inline]
   pub fn minor(&self, row: usize, column: usize) -> f32 {
     self.submatrix(row, column).determinant()
   }
 
+  #[inline]
   pub fn cofactor(&self, row: usize, column: usize) -> f32 {
     self.minor(row, column) * ((1 - ((row + column) as isize % 2) * 2) as f32)
   }
 
+  #[inline]
   pub fn determinant(&self) -> f32 {
     self[0][0] * self.cofactor(0, 0)
       + self[0][1] * self.cofactor(0, 1)
