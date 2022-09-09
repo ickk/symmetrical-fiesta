@@ -17,9 +17,7 @@ impl Sphere {
 
 impl Object for Sphere {
   /// Returns the t values of the ray where it instersects with the Sphere
-  fn intersect(&self, ray: Ray) -> IntersectionCollection {
-    let ray = self.transform.inverse().unwrap() * ray;
-
+  fn local_intersect(&self, ray: Ray) -> IntersectionCollection {
     let sphere_to_ray = ray.origin - Point::ORIGIN;
 
     let a = ray.direction.dot(ray.direction);
@@ -45,14 +43,8 @@ impl Object for Sphere {
   }
 
   /// Returns the normal vector of the surface sphere at the given point
-  fn normal_at(&self, point: Point) -> Vector {
-    let inverse_transform = &self.transform.inverse().unwrap();
-    let object_point = inverse_transform * point;
-    let object_normal = object_point - Point::ORIGIN;
-    let world_normal = inverse_transform
-      .transpose()
-      .mul_vec_unchecked(object_normal);
-    world_normal.normalise()
+  fn local_normal_at(&self, object_point: Point) -> Vector {
+    object_point - Point::ORIGIN
   }
 
   fn material(&self) -> &Material {
