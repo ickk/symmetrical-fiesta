@@ -5,10 +5,10 @@ use std::f32::consts::PI;
 use std::{fs::File, io::Write};
 
 fn main() {
-  chapter_7();
+  chapter_8();
 }
 
-fn chapter_7() {
+fn chapter_8() {
   let world = {
     let mut world = World::new();
 
@@ -91,13 +91,17 @@ fn chapter_7() {
   };
 
   let camera = {
-    let mut camera = Camera::new(800, 600, PI/3.0);
-    camera.set_transform(Matrix4x4::view_transform((0.0, 1.5, -5.0), (0.0, 1.0, 00.0), (0.0, 1.0, 0.0)));
+    let mut camera = Camera::new(800, 600, PI / 3.0);
+    camera.set_transform(Matrix4x4::view_transform(
+      (0.0, 1.5, -5.0),
+      (0.0, 1.0, 00.0),
+      (0.0, 1.0, 0.0),
+    ));
     camera
   };
 
   let canvas = camera.render(&world);
-  canvas.to_image().save("chapter_7.png").unwrap();
+  canvas.to_image().save("chapter_8.png").unwrap();
 }
 
 fn chapter_6() {
@@ -134,7 +138,10 @@ fn chapter_6() {
           let normal = hit.object.normal_at(point);
           let eye = -ray.direction;
 
-          hit.object.material().lighting(&light, point, eye, normal)
+          hit
+            .object
+            .material()
+            .lighting(&light, point, eye, normal, false)
         };
 
         canvas.write_pixel(x, y, colour)

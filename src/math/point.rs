@@ -114,7 +114,6 @@ impl Mul<Point> for Matrix4x4 {
 }
 
 #[cfg(test)]
-#[allow(unused_variables)]
 mod tests {
   use super::*;
 
@@ -122,12 +121,12 @@ mod tests {
   fn construct_point() {
     // Construct a point from a tuple
     let point: Point = (1.0, 2.0, 3.0).into();
-    let expected = Point {
+    let _expected = Point {
       x: 1.0,
       y: 2.0,
       z: 3.0,
     };
-    assert!(matches!(point, expected));
+    assert!(matches!(point, _expected));
   }
 
   #[test]
@@ -136,21 +135,21 @@ mod tests {
     let point: Point = (1.0, 2.0, 3.0).into();
     let vector: Vector = (1.5, 2.5, 3.5).into();
     let sum = point + vector;
-    let expected = Point {
+    let _expected = Point {
       x: 2.5,
       y: 4.5,
       z: 6.5,
     };
-    assert!(matches!(sum, expected));
+    assert!(matches!(sum, _expected));
 
     // Add a Point to a Vector
     let sum = vector + point;
-    let expected = Point {
+    let _expected = Point {
       x: 2.5,
       y: 4.5,
       z: 6.5,
     };
-    assert!(matches!(sum, expected));
+    assert!(matches!(sum, _expected));
   }
 
   #[test]
@@ -158,12 +157,12 @@ mod tests {
     let point: Point = (1.0, 2.0, 3.0).into();
     let vector: Vector = (1.5, 2.5, 3.5).into();
     let result = point - vector;
-    let expected = Point {
+    let _expected = Point {
       x: -0.5,
       y: -0.5,
       z: -0.5,
     };
-    assert!(matches!(result, expected));
+    assert!(matches!(result, _expected));
   }
 }
 

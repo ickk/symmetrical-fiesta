@@ -23,11 +23,14 @@ impl World {
   }
 
   pub fn shade_hit(&self, computations: &IntersectionComputations) -> Colour {
+    let shadowed = self.is_shadowed(computations.over_position);
+
     computations.object.material().lighting(
       &self.lights[0],
-      computations.position,
+      computations.over_position,
       computations.eye,
       computations.normal,
+      shadowed,
     )
   }
 
@@ -39,6 +42,17 @@ impl World {
     } else {
       Colour::BLACK
     }
+  }
+
+  pub fn is_shadowed(&self, position: Point) -> bool {
+    let point_to_light = self.lights[0].position - position;
+    let distance = point_to_light.magnitude();
+    let ray = Ray::new(position, point_to_light.normalise());
+
+    self
+      .intersect(ray)
+      .hit()
+      .map_or(false, |hit| hit.t < distance)
   }
 }
 
@@ -144,7 +158,8 @@ mod tests {
     let computations = &intersection.prepare_computations(ray);
 
     let colour = world.shade_hit(computations);
-    assert!(colour.approx_eq(Colour::from((0.38066, 0.47583, 0.28550))));
+    eprintln!("{colour:?}");
+    assert!(colour.approx_eq(Colour::from((0.38063, 0.47578, 0.28547))));
   }
 
   #[test]
@@ -159,7 +174,8 @@ mod tests {
     };
     let computations = intersection.prepare_computations(ray);
     let colour = world.shade_hit(&computations);
-    assert!(colour.approx_eq(Colour::from((0.90498, 0.90498, 0.90498))));
+    eprintln!("{colour:?}");
+    assert!(colour.approx_eq(Colour::from((0.90450, 0.90450, 0.90450))));
   }
 
   #[test]
@@ -175,7 +191,8 @@ mod tests {
     let world = World::default();
     let ray = Ray::new((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
     let colour = world.colour_at(ray);
-    assert!(colour.approx_eq(Colour::new(0.3806612, 0.47582647, 0.2854959)));
+    eprintln!("{colour:?}");
+    assert!(colour.approx_eq(Colour::new(0.38063, 0.47578, 0.28547)));
   }
 
   #[test]
@@ -211,5 +228,61 @@ mod tests {
 
     let colour = world.colour_at(ray);
     assert!(colour.approx_eq(inner_colour));
+  }
+
+  #[test]
+  fn no_shadow_when_nothing_is_colinear() {
+    let world = World::default();
+    let position = Point::new(0.0, 10.0, 0.0);
+
+    assert!(!world.is_shadowed(position));
+  }
+
+  #[test]
+  fn shadow_when_object_between_point_and_light() {
+    let world = World::default();
+    let position = Point::new(10.0, -10.0, 10.0);
+
+    assert!(world.is_shadowed(position));
+  }
+
+  #[test]
+  fn no_shadow_when_object_behind_light() {
+    let world = World::default();
+    let position = Point::new(-20.0, 20.0, -20.0);
+
+    assert!(!world.is_shadowed(position));
+  }
+
+  #[test]
+  fn no_shadow_when_object_behind_point() {
+    let world = World::default();
+    let position = Point::new(-2.0, 2.0, -2.0);
+
+    assert!(!world.is_shadowed(position));
+  }
+
+  #[test]
+  fn shading_shadow() {
+    let mut world = World::new();
+    world
+      .lights
+      .push(PointLight::new((0.0, 0.0, -10.0), (1.0, 1.0, 1.0)));
+    let sphere_1 = Box::new(Sphere::new());
+    let mut sphere_2 = Box::new(Sphere::new());
+    sphere_2.transform = Matrix4x4::translation(0.0, 0.0, 10.0);
+    world.objects.push(sphere_1);
+    world.objects.push(sphere_2);
+
+    let ray = Ray::new((0.0, 0.0, 5.0), (0.0, 0.0, 1.0));
+    let intersection = Intersection {
+      t: 4.0,
+      object: &*world.objects[1],
+    };
+    let computations = intersection.prepare_computations(ray);
+
+    let colour = world.shade_hit(&computations);
+    let expected = Colour::new(0.1, 0.1, 0.1);
+    assert!(colour.approx_eq(expected));
   }
 }

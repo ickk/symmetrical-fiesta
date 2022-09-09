@@ -173,7 +173,6 @@ impl Mul<Vector> for Matrix4x4 {
 }
 
 #[cfg(test)]
-#[allow(unused_variables)]
 mod tests {
   use super::*;
 
@@ -181,12 +180,12 @@ mod tests {
   fn construct_vector() {
     // Construct a Vector from a tuple
     let vector: Vector = (1.0, 2.0, 3.0).into();
-    let expected = Vector {
+    let _expected = Vector {
       x: 1.0,
       y: 2.0,
       z: 3.0,
     };
-    assert!(matches!(vector, expected));
+    assert!(matches!(vector, _expected));
 
     // Construct a Vector by subtracting one point from another
     let point_a = Point {
@@ -200,23 +199,23 @@ mod tests {
       z: 0.3,
     };
     let vector = point_a - point_b;
-    let expected = Vector {
+    let _expected = Vector {
       x: 0.9,
       y: 1.8,
       z: 2.7,
     };
-    assert!(matches!(vector, expected))
+    assert!(matches!(vector, _expected))
   }
 
   #[test]
   fn negate_vector() {
     let vector = Vector::from((1.0, 2.0, 3.0));
-    let expected = Vector {
+    let _expected = Vector {
       x: -1.0,
       y: -2.0,
       z: -3.0,
     };
-    assert!(matches!(-vector, expected));
+    assert!(matches!(-vector, _expected));
   }
 
   #[test]
@@ -224,12 +223,12 @@ mod tests {
     let vector_a: Vector = (1.0, 2.0, 3.0).into();
     let vector_b: Vector = (0.1, 0.2, 0.3).into();
     let sum = vector_a + vector_b;
-    let expected = Vector {
+    let _expected = Vector {
       x: 1.1,
       y: 2.2,
       z: 3.3,
     };
-    assert!(matches!(sum, expected));
+    assert!(matches!(sum, _expected));
   }
 
   #[test]
@@ -237,12 +236,12 @@ mod tests {
     let vector_a: Vector = (1.0, 2.0, 3.0).into();
     let vector_b: Vector = (0.1, 0.2, 0.3).into();
     let result = vector_a - vector_b;
-    let expected = Vector {
+    let _expected = Vector {
       x: 0.9,
       y: 1.8,
       z: 2.7,
     };
-    assert!(matches!(result, expected));
+    assert!(matches!(result, _expected));
   }
 
   #[test]
@@ -251,20 +250,20 @@ mod tests {
     let scalar = 2.0;
     let vector: Vector = (0.5, 1.0, 2.0).into();
     let result = scalar * vector;
-    let expected = Vector {
+    let _expected = Vector {
       x: 1.0,
       y: 2.0,
       z: 4.0,
     };
-    assert!(matches!(result, expected));
+    assert!(matches!(result, _expected));
     // multiple scalar on the right
     let result = vector * scalar;
-    let expected = Vector {
+    let _expected = Vector {
       x: 1.0,
       y: 2.0,
       z: 4.0,
     };
-    assert!(matches!(result, expected));
+    assert!(matches!(result, _expected));
   }
 
   #[test]
@@ -272,12 +271,12 @@ mod tests {
     let scalar = 2.0;
     let vector: Vector = (1.0, 2.0, 4.0).into();
     let result = vector / scalar;
-    let expected = Vector {
+    let _expected = Vector {
       x: 0.5,
       y: 1.0,
       z: 2.0,
     };
-    assert!(matches!(result, expected));
+    assert!(matches!(result, _expected));
   }
 
   #[test]
@@ -291,12 +290,12 @@ mod tests {
   fn norm_of_vector() {
     let vector: Vector = (3.0, 4.0, 0.0).into();
     let norm = vector.normalise();
-    let expected = Vector {
+    let _expected = Vector {
       x: 3.0 / 5.0,
       y: 4.0 / 5.0,
       z: 0.0,
     };
-    assert!(matches!(norm, expected));
+    assert!(matches!(norm, _expected));
   }
 
   #[test]
@@ -312,19 +311,19 @@ mod tests {
     let vector_a: Vector = (1.0, 2.0, 3.0).into();
     let vector_b: Vector = (2.0, 3.0, 4.0).into();
     let a_cross_b = vector_a.cross(vector_b);
-    let expected = Vector {
+    let _expected = Vector {
       x: -1.0,
       y: 2.0,
       z: -1.0,
     };
-    assert!(matches!(a_cross_b, expected));
+    assert!(matches!(a_cross_b, _expected));
     let b_cross_a = vector_b.cross(vector_a);
-    let expected = Vector {
+    let _expected = Vector {
       x: 1.0,
       y: -2.0,
       z: 1.0,
     };
-    assert!(matches!(b_cross_a, expected));
+    assert!(matches!(b_cross_a, _expected));
   }
 
   #[test]

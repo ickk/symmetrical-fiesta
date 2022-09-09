@@ -133,7 +133,6 @@ impl Colour {
 }
 
 #[cfg(test)]
-#[allow(unused_variables)]
 mod tests {
   use super::*;
   use crate::math::ApproxEq;
@@ -142,12 +141,12 @@ mod tests {
   fn construct_colour() {
     // construct Colour from tuple
     let colour: Colour = (-0.5, 0.4, 1.7).into();
-    let expected = Colour {
+    let _expected = Colour {
       red: -0.5,
       green: 0.4,
       blue: 1.7,
     };
-    assert!(matches!(colour, expected));
+    assert!(matches!(colour, _expected));
   }
 
   #[test]

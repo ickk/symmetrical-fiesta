@@ -150,7 +150,8 @@ mod tests {
 
     let canvas = camera.render(&world);
     let result = canvas.pixel_at(5, 5);
-    let expected = Colour::new(0.38066, 0.47583, 0.2855);
+    eprintln!("{result:?}");
+    let expected = Colour::new(0.38063, 0.47578, 0.28547);
     assert!(result.approx_eq(expected));
   }
 }

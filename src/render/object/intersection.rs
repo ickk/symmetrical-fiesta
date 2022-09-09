@@ -13,6 +13,7 @@ pub struct IntersectionComputations<'a> {
   pub t: f32,
   pub object: &'a dyn Object,
   pub position: Point,
+  pub over_position: Point,
   pub eye: Vector,
   pub normal: Vector,
   pub kind: IntersectionType,
@@ -38,11 +39,13 @@ impl Intersection<'_> {
     } else {
       kind = Outside;
     }
+    let over_position = position + normal * 0.0015;
 
     IntersectionComputations {
       t: self.t,
       object: self.object,
       position,
+      over_position,
       eye,
       normal,
       kind,
@@ -174,7 +177,6 @@ mod tests {
   }
 
   #[test]
-  #[allow(unused_variables)]
   fn hit_is_lowest_nonnegative() {
     let sphere = Sphere::new();
 
@@ -190,7 +192,7 @@ mod tests {
       t: -3.0,
       object: &sphere,
     };
-    let intersection_d = Intersection {
+    let _intersection_d = Intersection {
       t: 2.0,
       object: &sphere,
     };
@@ -200,12 +202,12 @@ mod tests {
       intersection_a,
       intersection_b,
       intersection_c,
-      intersection_d.clone(),
+      _intersection_d.clone(),
     ]
     .map(|i| intersections.insert(i));
 
-    let hit = intersections.hit().unwrap();
-    assert!(matches!(hit, intersection_d));
+    let _hit = intersections.hit().unwrap();
+    assert!(matches!(_hit, _intersection_d));
   }
 
   #[test]
@@ -237,5 +239,19 @@ mod tests {
     assert!(_computations
       .normal
       .approx_eq(Vector::from((0.0, 0.0, -1.0))));
+  }
+
+  #[test]
+  fn hit_over_position_property() {
+    let ray = Ray::new((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
+    let mut sphere = Sphere::new();
+    sphere.transform = Matrix4x4::translation(0.0, 0.0, 1.0);
+    let intersection = Intersection {
+      t: 5.0,
+      object: &sphere,
+    };
+    let computations = intersection.prepare_computations(ray);
+    assert!(computations.over_position.z < -EPSILON / 2.0);
+    assert!(computations.position.z > computations.over_position.z);
   }
 }

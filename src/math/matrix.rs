@@ -429,11 +429,10 @@ mod tests {
   }
 
   #[test]
-  #[allow(unused_variables)]
   fn modify_matrix4x4() {
     let mut matrix: Matrix4x4 = [[0.0; 4]; 4].into();
     matrix[1][3] = 3.14;
-    let expected = [
+    let _expected = [
       [0.0; 4],
       [0.0, 0.0, 0.0, 3.14],
       [0.0; 4],
@@ -441,8 +440,8 @@ mod tests {
     ].into();
 
     assert!(matrix[1][3].approx_eq(3.14));
-    assert!(matrix.clone().approx_eq(expected));
-    assert!(matches!(matrix, expected));
+    assert!(matrix.clone().approx_eq(_expected));
+    assert!(matches!(matrix, _expected));
   }
 
   #[test]
