@@ -1,3 +1,4 @@
+#![allow(clippy::op_ref)]
 use super::*;
 
 use std::ops::Mul;

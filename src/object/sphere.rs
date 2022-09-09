@@ -58,6 +58,10 @@ impl Object for Sphere {
   fn material(&self) -> &Material {
     &self.material
   }
+
+  fn transform(&self) -> &Matrix4x4 {
+    &self.transform
+  }
 }
 
 #[cfg(test)]

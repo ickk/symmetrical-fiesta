@@ -14,6 +14,12 @@ impl PointLight {
   }
 }
 
+impl ApproxEq for PointLight {
+  fn approx_eq(&self, rhs: Self) -> bool {
+    self.position.approx_eq(rhs.position) && self.intensity.approx_eq(rhs.intensity)
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
