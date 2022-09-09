@@ -1,9 +1,9 @@
 pub mod intersection;
-pub mod sphere;
 pub mod plane;
+pub mod sphere;
 pub use intersection::*;
-pub use sphere::*;
 pub use plane::*;
+pub use sphere::*;
 
 use crate::*;
 use std::fmt::Debug;
