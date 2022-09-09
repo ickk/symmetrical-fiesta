@@ -5,7 +5,99 @@ use std::f32::consts::PI;
 use std::{fs::File, io::Write};
 
 fn main() {
-  chapter_6();
+  chapter_7();
+}
+
+fn chapter_7() {
+  let world = {
+    let mut world = World::new();
+
+    let floor = {
+      let mut sphere = Sphere::new();
+      sphere.transform = Matrix4x4::scale(10.0, 0.01, 10.0);
+      sphere.material = Material {
+        colour: (1.0, 0.9, 0.9).into(),
+        specular: 0.0,
+        ..Default::default()
+      };
+      sphere
+    };
+
+    let left_wall = {
+      let mut sphere = Sphere::new();
+      sphere.transform = Matrix4x4::translation(0.0, 0.0, 5.0)
+        * Matrix4x4::rotation_y(-PI / 4.0)
+        * Matrix4x4::rotation_x(PI / 2.0)
+        * Matrix4x4::scale(10.0, 0.01, 10.0);
+      sphere.material = floor.material.clone();
+      sphere
+    };
+
+    let right_wall = {
+      let mut sphere = Sphere::new();
+      sphere.transform = Matrix4x4::translation(0.0, 0.0, 5.0)
+        * Matrix4x4::rotation_y(PI / 4.0)
+        * Matrix4x4::rotation_x(PI / 2.0)
+        * Matrix4x4::scale(10.0, 0.01, 10.0);
+      sphere.material = floor.material.clone();
+      sphere
+    };
+
+    let middle = {
+      let mut sphere = Sphere::new();
+      sphere.transform = Matrix4x4::translation(-0.5, 1.0, 0.5);
+      sphere.material = Material {
+        colour: (0.1, 1.0, 0.5).into(),
+        diffuse: 0.7,
+        specular: 0.3,
+        ..Default::default()
+      };
+      sphere
+    };
+
+    let right = {
+      let mut sphere = Sphere::new();
+      sphere.transform = Matrix4x4::translation(1.5, 1.0, -0.5) * Matrix4x4::scale(0.5, 0.5, 0.5);
+      sphere.material = Material {
+        colour: (0.5, 1.0, 0.1).into(),
+        diffuse: 0.7,
+        specular: 0.3,
+        ..Default::default()
+      };
+      sphere
+    };
+
+    let left = {
+      let mut sphere = Sphere::new();
+      sphere.transform =
+        Matrix4x4::translation(-1.5, 0.33, -0.75) * Matrix4x4::scale(0.33, 0.33, 0.33);
+      sphere.material = Material {
+        colour: (1.0, 0.8, 0.1).into(),
+        diffuse: 0.7,
+        specular: 0.3,
+        ..Default::default()
+      };
+      sphere
+    };
+
+    let light = PointLight::new((-10.0, 10.0, -10.0), (1.0, 1.0, 1.0));
+
+    for object in [floor, left_wall, right_wall, middle, right, left] {
+      world.objects.push(Box::new(object));
+    }
+    world.lights.push(light);
+
+    world
+  };
+
+  let camera = {
+    let mut camera = Camera::new(800, 600, PI/3.0);
+    camera.set_transform(Matrix4x4::view_transform((0.0, 1.5, -5.0), (0.0, 1.0, 00.0), (0.0, 1.0, 0.0)));
+    camera
+  };
+
+  let canvas = camera.render(&world);
+  canvas.to_image().save("chapter_7.png").unwrap();
 }
 
 fn chapter_6() {

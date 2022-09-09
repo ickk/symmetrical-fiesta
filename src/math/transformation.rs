@@ -70,7 +70,9 @@ impl Matrix4x4 {
     }
   }
 
-  pub fn view_transform(from: Point, to: Point, up: Vector) -> Self {
+  pub fn view_transform(from: impl Into<Point>, to: impl Into<Point>, up: impl Into<Vector>) -> Self {
+    let (from, to, up) = (from.into(), to.into(), up.into());
+
     let forward = (to - from).normalise();
     let left = forward.cross(up.normalise());
     let up = left.cross(forward); // corrects for the given up vector being off
