@@ -1,7 +1,6 @@
 #![allow(clippy::op_ref)]
 
 use super::*;
-
 use std::ops::{Add, Mul, Sub};
 
 #[derive(Debug, Copy, Clone)]
@@ -9,6 +8,18 @@ pub struct Point {
   pub x: f32,
   pub y: f32,
   pub z: f32,
+}
+
+impl Point {
+  pub const ORIGIN: Self = Point {
+    x: 0.0,
+    y: 0.0,
+    z: 0.0,
+  };
+
+  pub fn new(x: f32, y: f32, z: f32) -> Self {
+    Point { x, y, z }
+  }
 }
 
 impl ApproxEq for Point {
@@ -100,14 +111,6 @@ impl Mul<Point> for Matrix4x4 {
   fn mul(self, rhs: Point) -> Point {
     &self * &rhs
   }
-}
-
-impl Point {
-  pub const ORIGIN: Self = Point {
-    x: 0.0,
-    y: 0.0,
-    z: 0.0,
-  };
 }
 
 #[cfg(test)]

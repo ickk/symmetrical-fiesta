@@ -69,6 +69,19 @@ impl Matrix4x4 {
       ],
     }
   }
+
+  pub fn view_transform(from: Point, to: Point, up: Vector) -> Self {
+    let forward = (to - from).normalise();
+    let left = forward.cross(up.normalise());
+    let up = left.cross(forward); // corrects for the given up vector being off
+    let orientation = Matrix4x4::from([
+      [left.x, left.y, left.z, 0.0],
+      [up.x, up.y, up.z, 0.0],
+      [-forward.x, -forward.y, -forward.z, 0.0],
+      [0.0, 0.0, 0.0, 1.0],
+    ]);
+    orientation * Matrix4x4::translation(-from.x, -from.y, -from.z)
+  }
 }
 
 #[cfg(test)]
@@ -297,5 +310,59 @@ mod tests {
     let expected = Point::from((15.0, 0.0, 7.0));
 
     assert!(result.approx_eq(expected));
+  }
+
+  #[test]
+  fn view_transform_default() {
+    let from = Point::new(0.0, 0.0, 0.0);
+    let to = Point::new(0.0, 0.0, -1.0);
+    let up = Vector::new(0.0, 1.0, 0.0);
+
+    let transform = Matrix4x4::view_transform(from, to, up);
+    let expected = Matrix4x4::IDENTITY;
+
+    assert!(transform.approx_eq(expected));
+  }
+
+  #[test]
+  fn view_transform_facing_positive_z() {
+    let from = Point::new(0.0, 0.0, 0.0);
+    let to = Point::new(0.0, 0.0, 1.0);
+    let up = Vector::new(0.0, 1.0, 0.0);
+
+    let transform = Matrix4x4::view_transform(from, to, up);
+    let expected = Matrix4x4::scale(-1.0, 1.0, -1.0);
+
+    assert!(transform.approx_eq(expected));
+  }
+
+  #[test]
+  fn view_transform_moves_world() {
+    let from = Point::new(0.0, 0.0, 8.0);
+    let to = Point::new(0.0, 0.0, 0.0);
+    let up = Vector::new(0.0, 1.0, 0.0);
+
+    let transform = Matrix4x4::view_transform(from, to, up);
+    let expected = Matrix4x4::translation(0.0, 0.0, -8.0);
+
+    assert!(transform.approx_eq(expected));
+  }
+
+  #[test]
+  fn view_transform_arbitrary() {
+    let from = Point::new(1.0, 3.0, 2.0);
+    let to = Point::new(4.0, -2.0, 8.0);
+    let up = Vector::new(1.0, 1.0, 0.0);
+
+    let transform = Matrix4x4::view_transform(from, to, up);
+    let expected: Matrix4x4 = [
+      [-0.50709, 0.50709, 0.67612, -2.36643],
+      [0.76772, 0.60609, 0.12122, -2.82843],
+      [-0.35857, 0.59761, -0.71714, 0.0],
+      [0.0, 0.0, 0.0, 1.0],
+    ]
+    .into();
+
+    assert!(transform.approx_eq(expected));
   }
 }

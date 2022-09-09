@@ -1,7 +1,6 @@
 #![allow(clippy::op_ref)]
 
 use super::*;
-
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug, Copy, Clone)]
@@ -9,6 +8,36 @@ pub struct Vector {
   pub x: f32,
   pub y: f32,
   pub z: f32,
+}
+
+impl Vector {
+  pub fn new(x: f32, y: f32, z: f32) -> Self {
+    Vector { x, y, z }
+  }
+
+  pub fn magnitude(self) -> f32 {
+    (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+  }
+
+  pub fn normalise(self) -> Vector {
+    (1.0 / self.magnitude()) * self
+  }
+
+  pub fn dot(self, rhs: Vector) -> f32 {
+    self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+  }
+
+  pub fn cross(self, rhs: Vector) -> Vector {
+    Vector {
+      x: self.y * rhs.z - self.z * rhs.y,
+      y: self.z * rhs.x - self.x * rhs.z,
+      z: self.x * rhs.y - self.y * rhs.x,
+    }
+  }
+
+  pub fn reflect(self, normal: Vector) -> Vector {
+    self - normal * 2.0 * self.dot(normal)
+  }
 }
 
 impl ApproxEq for Vector {
@@ -140,32 +169,6 @@ impl Mul<Vector> for Matrix4x4 {
 
   fn mul(self, rhs: Vector) -> Vector {
     &self * rhs
-  }
-}
-
-impl Vector {
-  pub fn magnitude(self) -> f32 {
-    (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
-  }
-
-  pub fn normalise(self) -> Vector {
-    (1.0 / self.magnitude()) * self
-  }
-
-  pub fn dot(self, rhs: Vector) -> f32 {
-    self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
-  }
-
-  pub fn cross(self, rhs: Vector) -> Vector {
-    Vector {
-      x: self.y * rhs.z - self.z * rhs.y,
-      y: self.z * rhs.x - self.x * rhs.z,
-      z: self.x * rhs.y - self.y * rhs.x,
-    }
-  }
-
-  pub fn reflect(self, normal: Vector) -> Vector {
-    self - normal * 2.0 * self.dot(normal)
   }
 }
 

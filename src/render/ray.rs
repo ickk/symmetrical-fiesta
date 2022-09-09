@@ -1,6 +1,5 @@
 #![allow(clippy::op_ref)]
-use super::*;
-
+use crate::*;
 use std::ops::Mul;
 
 #[derive(Debug, Copy, Clone)]

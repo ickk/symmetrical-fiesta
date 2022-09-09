@@ -1,7 +1,6 @@
 #![allow(unused)]
 
 use raytracer_challenge::*;
-
 use std::f32::consts::PI;
 use std::{fs::File, io::Write};
 
