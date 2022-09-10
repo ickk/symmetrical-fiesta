@@ -6,10 +6,10 @@ use std::f32::consts::PI;
 use std::{fs::File, io::Write};
 
 fn main() {
-  chapter_10();
+  chapter_11();
 }
 
-fn chapter_10() {
+fn chapter_11() {
   let world = {
     let mut world = World::new();
 
@@ -19,6 +19,8 @@ fn chapter_10() {
         pattern: Pattern::checkers((0.9, 0.9, 0.9).into(), (0.7, 0.7, 0.7).into())
           .with_transform(Matrix4x4::scale(1.5, 1.5, 1.5)),
         specular: 0.0,
+        reflective: 0.3,
+        shininess: 0.3,
         ..Default::default()
       };
       plane
@@ -45,6 +47,7 @@ fn chapter_10() {
         ),
         diffuse: 0.7,
         specular: 0.3,
+        reflective: 0.1,
         ..Default::default()
       };
       sphere
@@ -58,6 +61,7 @@ fn chapter_10() {
           .with_transform(Matrix4x4::rotation_z(3.0 * PI / 5.0) * Matrix4x4::scale(0.5, 1.0, 1.0)),
         diffuse: 0.7,
         specular: 0.3,
+        reflective: 0.05,
         ..Default::default()
       };
       sphere
@@ -73,6 +77,7 @@ fn chapter_10() {
           .with_transform(Matrix4x4::scale(0.25, 0.25, 0.25)),
         diffuse: 0.7,
         specular: 0.3,
+        reflective: 0.1,
         ..Default::default()
       };
       sphere
@@ -80,11 +85,12 @@ fn chapter_10() {
 
     let hemisphere = {
       let mut sphere = Sphere::new();
-      sphere.transform = Matrix4x4::translation(0.9, 0.05, 0.6) * Matrix4x4::scale(0.4, 0.4, 0.4);
+      sphere.transform = Matrix4x4::translation(0.8, 0.1, 4.0) * Matrix4x4::scale(0.5, 0.5, 0.5);
       sphere.material = Material {
-        pattern: Pattern::solid((0.2, 0.2, 0.8).into()),
-        diffuse: 0.7,
+        pattern: Pattern::solid((0.3, 0.4, 0.7).into()),
+        diffuse: 0.0,
         specular: 0.3,
+        reflective: 0.5,
         ..Default::default()
       };
       sphere
@@ -102,9 +108,9 @@ fn chapter_10() {
   };
 
   let camera = {
-    let mut camera = Camera::new(1000, 750, PI / 6.0);
+    let mut camera = Camera::new(2000, 1500, PI / 6.0);
     camera.set_transform(Matrix4x4::view_transform(
-      (0.0, 3.35, -11.0),
+      (0.0, 6.0, -11.0),
       (-0.2, 1.5, 0.0),
       (0.0, 1.0, 0.0),
     ));
@@ -112,5 +118,5 @@ fn chapter_10() {
   };
 
   let canvas = camera.render(&world);
-  canvas.to_image().save("chapter_10.png").unwrap();
+  canvas.to_image().save("chapter_11.png").unwrap();
 }

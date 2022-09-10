@@ -1,5 +1,7 @@
 use crate::*;
 
+pub static MAX_RECURSION_DEPTH: usize = 5;
+
 pub struct World {
   pub objects: Vec<Box<dyn Object>>,
   pub lights: Vec<PointLight>,
@@ -22,26 +24,34 @@ impl World {
     intersections
   }
 
-  pub fn shade_hit(&self, computations: &IntersectionComputations) -> Colour {
+  pub fn shade_hit(&self, computations: &IntersectionComputations, remaining: usize) -> Colour {
     let shadowed = self.is_shadowed(computations.over_position);
     let local_position =
       computations.object.transform().inverse().unwrap() * computations.over_position;
 
-    computations.object.material().lighting(
+    let surface_colour = computations.object.material().lighting(
       &self.lights[0],
       computations.over_position,
       computations.eye,
       computations.normal,
       shadowed,
       local_position,
-    )
+    );
+
+    let reflected_colour = self.reflected_colour(computations, remaining);
+
+    surface_colour + reflected_colour
   }
 
   pub fn colour_at(&self, ray: Ray) -> Colour {
+    self._colour_at(ray, MAX_RECURSION_DEPTH)
+  }
+
+  pub fn _colour_at(&self, ray: Ray, remaining: usize) -> Colour {
     let intersections = self.intersect(ray);
     if let Some(hit) = intersections.hit() {
       let computations = hit.prepare_computations(ray);
-      self.shade_hit(&computations)
+      self.shade_hit(&computations, remaining)
     } else {
       Colour::BLACK
     }
@@ -56,6 +66,20 @@ impl World {
       .intersect(ray)
       .hit()
       .map_or(false, |hit| hit.t < distance)
+  }
+
+  pub fn reflected_colour(
+    &self,
+    computations: &IntersectionComputations,
+    remaining: usize,
+  ) -> Colour {
+    if remaining == 0 || computations.object.material().reflective == 0.0 {
+      return Colour::BLACK;
+    }
+    let reflect_ray = Ray::new(computations.over_position, computations.reflect);
+    let colour = self._colour_at(reflect_ray, remaining - 1);
+
+    colour * computations.object.material().reflective
   }
 }
 
@@ -158,7 +182,7 @@ mod tests {
     };
     let computations = &intersection.prepare_computations(ray);
 
-    let colour = world.shade_hit(computations);
+    let colour = world.shade_hit(computations, 0);
     eprintln!("{colour:?}");
     assert!(colour.approx_eq(Colour::from((0.38063, 0.47578, 0.28547))));
   }
@@ -174,7 +198,7 @@ mod tests {
       object: &**shape,
     };
     let computations = intersection.prepare_computations(ray);
-    let colour = world.shade_hit(&computations);
+    let colour = world.shade_hit(&computations, 0);
     eprintln!("{colour:?}");
     assert!(colour.approx_eq(Colour::from((0.90450, 0.90450, 0.90450))));
   }
@@ -282,8 +306,152 @@ mod tests {
     };
     let computations = intersection.prepare_computations(ray);
 
-    let colour = world.shade_hit(&computations);
+    let colour = world.shade_hit(&computations, 0);
     let expected = Colour::new(0.1, 0.1, 0.1);
+    assert!(colour.approx_eq(expected));
+  }
+
+  #[test]
+  fn reflected_colour_for_nonreflective_material() {
+    let world = {
+      let mut world = World::new();
+      world
+        .lights
+        .push(PointLight::new((-10.0, 10.0, -10.0), (1.0, 1.0, 1.0)));
+
+      let mut sphere_1 = Sphere::new();
+      sphere_1.material = Material {
+        pattern: Pattern::solid(Colour::new(0.8, 1.0, 0.6)),
+        diffuse: 0.7,
+        specular: 0.2,
+        ..Default::default()
+      };
+      let mut sphere_2 = Sphere::new();
+      sphere_2.transform = Matrix4x4::scale(0.5, 0.5, 0.5);
+      sphere_2.material.ambient = 1.0;
+      world.objects.push(Box::new(sphere_1));
+      world.objects.push(Box::new(sphere_2));
+
+      world
+    };
+
+    let ray = Ray::new((0.0, 0.0, 0.0), (0.0, 0.0, 1.0));
+    let intersection = Intersection {
+      t: 1.0,
+      object: &*world.objects[1],
+    };
+    let computations = &intersection.prepare_computations(ray);
+    let colour = world.reflected_colour(computations, 1);
+
+    let expected = Colour::new(0.0, 0.0, 0.0);
+    assert!(colour.approx_eq(expected));
+  }
+
+  #[test]
+  fn reflected_colour_for_reflective_material() {
+    let world = {
+      let mut world = World::default();
+      let mut plane = Plane::new();
+      plane.transform = Matrix4x4::translation(0.0, -1.0, 0.0);
+      plane.material.reflective = 0.5;
+      world.objects.push(Box::new(plane));
+
+      world
+    };
+
+    let ray = Ray::new(
+      (0.0, 0.0, -3.0),
+      (0.0, -1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()),
+    );
+    let intersection = Intersection {
+      t: 2.0f32.sqrt(),
+      object: &*world.objects[2],
+    };
+    let computations = &intersection.prepare_computations(ray);
+    let colour = world.reflected_colour(computations, 1);
+
+    let expected = Colour::new(0.19057, 0.23821, 0.14293);
+    println!("{colour:?}");
+    assert!(colour.approx_eq(expected));
+  }
+
+  #[test]
+  fn shade_hit_with_reflective_material() {
+    let world = {
+      let mut world = World::default();
+      let mut plane = Plane::new();
+      plane.transform = Matrix4x4::translation(0.0, -1.0, 0.0);
+      plane.material.reflective = 0.5;
+      world.objects.push(Box::new(plane));
+
+      world
+    };
+
+    let ray = Ray::new(
+      (0.0, 0.0, -3.0),
+      (0.0, -1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()),
+    );
+    let intersection = Intersection {
+      t: 2.0f32.sqrt(),
+      object: &*world.objects[2],
+    };
+    let computations = &intersection.prepare_computations(ray);
+    let colour = world.shade_hit(computations, 1);
+
+    let expected = Colour::new(0.87695, 0.92459, 0.82931);
+    println!("{colour:?}");
+    assert!(colour.approx_eq(expected));
+  }
+
+  #[test]
+  fn avoid_infinite_recursion_with_mutually_reflective_surfaces() {
+    let world = {
+      let mut world = World::new();
+      world
+        .lights
+        .push(PointLight::new((0.0, 0.0, 0.0), (1.0, 1.0, 1.0)));
+
+      let mut plane_lower = Plane::new();
+      plane_lower.transform = Matrix4x4::translation(0.0, -1.0, 0.0);
+      plane_lower.material.reflective = 1.0;
+      world.objects.push(Box::new(plane_lower));
+
+      let mut plane_upper = Plane::new();
+      plane_upper.transform = Matrix4x4::translation(0.0, 1.0, 0.0);
+      plane_upper.material.reflective = 1.0;
+      world.objects.push(Box::new(plane_upper));
+
+      world
+    };
+
+    let ray = Ray::new(Point::ORIGIN, (0.0, 1.0, 0.0));
+    let _colour = world.colour_at(ray);
+  }
+
+  #[test]
+  fn reflected_colour_at_maximum_recursion_depth() {
+    let world = {
+      let mut world = World::default();
+      let mut plane = Plane::new();
+      plane.transform = Matrix4x4::translation(0.0, -1.0, 0.0);
+      plane.material.reflective = 0.5;
+      world.objects.push(Box::new(plane));
+
+      world
+    };
+
+    let ray = Ray::new(
+      (0.0, 0.0, -3.0),
+      (0.0, -1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()),
+    );
+    let intersection = Intersection {
+      t: 2.0f32.sqrt(),
+      object: &*world.objects[2],
+    };
+    let computations = &intersection.prepare_computations(ray);
+    let colour = world.reflected_colour(computations, 0);
+
+    let expected = Colour::BLACK;
     assert!(colour.approx_eq(expected));
   }
 }

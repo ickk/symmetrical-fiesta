@@ -17,6 +17,7 @@ pub struct IntersectionComputations<'a> {
   pub eye: Vector,
   pub normal: Vector,
   pub kind: IntersectionType,
+  pub reflect: Vector,
 }
 
 #[derive(Debug)]
@@ -40,6 +41,7 @@ impl Intersection<'_> {
       kind = Outside;
     }
     let over_position = position + normal * 0.0015;
+    let reflect = ray.direction.reflect(normal);
 
     IntersectionComputations {
       t: self.t,
@@ -49,6 +51,7 @@ impl Intersection<'_> {
       eye,
       normal,
       kind,
+      reflect,
     }
   }
 }
@@ -253,5 +256,22 @@ mod tests {
     let computations = intersection.prepare_computations(ray);
     assert!(computations.over_position.z < -EPSILON / 2.0);
     assert!(computations.position.z > computations.over_position.z);
+  }
+
+  #[test]
+  fn prepare_computations_reflection_vector() {
+    let shape = Plane::new();
+    let ray = Ray::new(
+      (0.0, 1.0, -1.0),
+      (0.0, -1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()),
+    );
+    let intersection = Intersection {
+      t: 2.0f32.sqrt(),
+      object: &shape,
+    };
+    let reflect = intersection.prepare_computations(ray).reflect;
+
+    let expected = Vector::new(0.0, 1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt());
+    assert!(reflect.approx_eq(expected));
   }
 }

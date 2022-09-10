@@ -10,6 +10,7 @@ pub struct Material {
   pub diffuse: f32,
   pub specular: f32,
   pub shininess: f32,
+  pub reflective: f32,
 }
 
 impl Default for Material {
@@ -20,6 +21,7 @@ impl Default for Material {
       diffuse: 0.9,
       specular: 0.9,
       shininess: 200.0,
+      reflective: 0.0,
     }
   }
 }
@@ -73,6 +75,7 @@ mod tests {
       diffuse: 0.9,
       specular: 0.9,
       shininess: 200.0,
+      reflective: 0.0,
     };
     assert!(matches!(_default_material, _expected))
   }

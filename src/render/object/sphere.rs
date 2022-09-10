@@ -249,11 +249,8 @@ mod tests {
     sphere.material = material;
 
     let expected = Material {
-      pattern: Pattern::solid(Colour::WHITE),
       ambient: 1.0,
-      diffuse: 0.9,
-      specular: 0.9,
-      shininess: 200.0,
+      ..Default::default()
     };
     assert!(matches!(sphere.material, expected));
   }
