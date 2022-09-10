@@ -249,7 +249,7 @@ mod tests {
     sphere.material = material;
 
     let expected = Material {
-      colour: Colour::WHITE,
+      pattern: Pattern::solid(Colour::WHITE),
       ambient: 1.0,
       diffuse: 0.9,
       specular: 0.9,

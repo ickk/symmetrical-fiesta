@@ -24,6 +24,8 @@ impl World {
 
   pub fn shade_hit(&self, computations: &IntersectionComputations) -> Colour {
     let shadowed = self.is_shadowed(computations.over_position);
+    let local_position =
+      computations.object.transform().inverse().unwrap() * computations.over_position;
 
     computations.object.material().lighting(
       &self.lights[0],
@@ -31,6 +33,7 @@ impl World {
       computations.eye,
       computations.normal,
       shadowed,
+      local_position,
     )
   }
 
@@ -65,7 +68,7 @@ impl Default for World {
 
     let mut sphere_1 = Sphere::new();
     sphere_1.material = Material {
-      colour: (0.8, 1.0, 0.6).into(),
+      pattern: Pattern::solid(Colour::new(0.8, 1.0, 0.6)),
       diffuse: 0.7,
       specular: 0.2,
       ..Default::default()
@@ -100,12 +103,10 @@ mod tests {
 
     let sphere_1 = &world.objects[0];
     assert!(sphere_1.transform().approx_eq(Matrix4x4::IDENTITY));
-    assert!(sphere_1
-      .material()
-      .colour
-      .approx_eq(Colour::from((0.8, 1.0, 0.6))));
     assert!(sphere_1.material().diffuse.approx_eq(0.7));
     assert!(sphere_1.material().specular.approx_eq(0.2));
+    let _expected = Pattern::solid(Colour::new(0.8, 1.0, 0.6));
+    assert!(matches!(&sphere_1.material().pattern, _expected));
 
     let sphere_2 = &world.objects[1];
     assert!(sphere_2
@@ -205,7 +206,7 @@ mod tests {
 
       let mut outer = Sphere::new();
       outer.material = Material {
-        colour: (0.8, 1.0, 0.6).into(),
+        pattern: Pattern::solid((0.8, 1.0, 0.6).into()),
         diffuse: 0.7,
         specular: 0.2,
         ambient: 1.0,
@@ -216,7 +217,7 @@ mod tests {
       let inner_colour = Colour::new(0.2, 0.3, 0.4);
       inner.material = Material {
         ambient: 1.0,
-        colour: inner_colour,
+        pattern: Pattern::solid(inner_colour),
         ..Default::default()
       };
 

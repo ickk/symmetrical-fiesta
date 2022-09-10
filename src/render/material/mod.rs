@@ -1,8 +1,11 @@
+pub mod pattern;
+pub use pattern::*;
+
 use crate::*;
 
 #[derive(Debug, Clone)]
 pub struct Material {
-  pub colour: Colour,
+  pub pattern: Pattern,
   pub ambient: f32,
   pub diffuse: f32,
   pub specular: f32,
@@ -12,7 +15,7 @@ pub struct Material {
 impl Default for Material {
   fn default() -> Material {
     Material {
-      colour: Colour::WHITE,
+      pattern: Pattern::solid(Colour::WHITE),
       ambient: 0.1,
       diffuse: 0.9,
       specular: 0.9,
@@ -29,8 +32,9 @@ impl Material {
     eye_vector: Vector,
     normal_vector: Vector,
     in_shadow: bool,
+    local_position: Point,
   ) -> Colour {
-    let effective_colour = self.colour * light.intensity;
+    let effective_colour = self.pattern.colour_at(local_position) * light.intensity;
     let light_vector = (light.position - position).normalise();
     let ambient = effective_colour * self.ambient;
 
@@ -64,7 +68,7 @@ mod tests {
   fn construct_default_material() {
     let _default_material = Material::default();
     let _expected = Material {
-      colour: Colour::WHITE,
+      pattern: Pattern::solid(Colour::WHITE),
       ambient: 0.1,
       diffuse: 0.9,
       specular: 0.9,
@@ -81,7 +85,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(&light, position, eye_vector, normal_vector, false);
+    let result = material.lighting(&light, position, eye_vector, normal_vector, false, position);
     let expected = Colour::from((1.9, 1.9, 1.9));
 
     assert!(result.approx_eq(expected));
@@ -95,7 +99,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(&light, position, eye_vector, normal_vector, false);
+    let result = material.lighting(&light, position, eye_vector, normal_vector, false, position);
     let expected = Colour::from((1.0, 1.0, 1.0));
 
     assert!(result.approx_eq(expected));
@@ -109,7 +113,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(&light, position, eye_vector, normal_vector, false);
+    let result = material.lighting(&light, position, eye_vector, normal_vector, false, position);
     let expected = Colour::from((0.7364, 0.7364, 0.7364));
 
     assert!(result.approx_eq(expected));
@@ -123,7 +127,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(&light, position, eye_vector, normal_vector, false);
+    let result = material.lighting(&light, position, eye_vector, normal_vector, false, position);
     let expected = Colour::from((1.6364, 1.6364, 1.6364));
 
     assert!(result.approx_eq(expected));
@@ -137,7 +141,7 @@ mod tests {
     let material = Material::default();
     let position: Point = (0.0, 0.0, 0.0).into();
 
-    let result = material.lighting(&light, position, eye_vector, normal_vector, false);
+    let result = material.lighting(&light, position, eye_vector, normal_vector, false, position);
     let expected = Colour::from((0.1, 0.1, 0.1));
 
     assert!(result.approx_eq(expected));
@@ -152,7 +156,7 @@ mod tests {
     let normal_vector = Vector::new(0.0, 0.0, -1.0);
     let light = PointLight::new(Point::new(0.0, 0.00, -10.0), Colour::new(1.0, 1.0, 1.0));
 
-    let result = material.lighting(&light, position, eye_vector, normal_vector, true);
+    let result = material.lighting(&light, position, eye_vector, normal_vector, true, position);
     let expected = Colour::new(0.1, 0.1, 0.1);
 
     assert!(result.approx_eq(expected));
