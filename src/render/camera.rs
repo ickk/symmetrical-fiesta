@@ -1,4 +1,6 @@
 use crate::*;
+use image::{ImageBuffer, Rgb};
+use rayon::prelude::*;
 
 pub struct Camera {
   pub canvas_width: usize,
@@ -48,6 +50,38 @@ impl Camera {
     let direction = (pixel - origin).normalise();
 
     Ray::new(origin, direction)
+  }
+
+  pub fn render_img(&self, world: &World) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    eprintln!("rendering..");
+    let capacity = 3 * self.canvas_height * self.canvas_width;
+    let mut buf = Vec::with_capacity(capacity);
+
+    // Safety: We create a vector with uninitialised values that we immediately
+    // populate with data. Every entry ought to be populated if the assertion
+    // passes.
+    unsafe {
+      assert_eq!(capacity % 3, 0);
+      buf.set_len(capacity);
+
+      buf
+        .par_chunks_mut(3)
+        .enumerate()
+        .for_each(|(index, pixel)| {
+          let (x, y) = (index % self.canvas_width, index / self.canvas_width);
+          if x == 0 {
+            eprint!("\r{y:6.0} ");
+          }
+          let ray = self.ray_for_pixel(x, y);
+          let rgb: Rgb<u8> = world.colour_at(ray).into();
+          pixel[0] = rgb.0[0];
+          pixel[1] = rgb.0[1];
+          pixel[2] = rgb.0[2];
+        });
+    }
+
+    eprintln!("\rdone. ");
+    ImageBuffer::from_raw(self.canvas_width as _, self.canvas_height as _, buf).unwrap()
   }
 
   pub fn render(&self, world: &World) -> Canvas {

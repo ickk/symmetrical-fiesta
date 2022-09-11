@@ -130,6 +130,14 @@ impl Colour {
       blue: self.blue * rhs.blue,
     }
   }
+
+  pub fn clamp(self, min: f32, max: f32) -> Colour {
+    Colour {
+      red: self.red.clamp(min, max),
+      green: self.green.clamp(min, max),
+      blue: self.blue.clamp(min, max),
+    }
+  }
 }
 
 #[cfg(test)]

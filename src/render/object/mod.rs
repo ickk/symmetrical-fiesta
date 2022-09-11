@@ -8,7 +8,7 @@ pub use sphere::*;
 use crate::*;
 use std::fmt::Debug;
 
-pub trait Object: Debug {
+pub trait Object: Debug + Send + Sync {
   fn intersect(&self, ray: Ray) -> IntersectionCollection {
     self.local_intersect(self.transform().inverse().unwrap() * ray)
   }

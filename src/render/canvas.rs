@@ -76,10 +76,9 @@ impl Canvas {
     img
       .pixels_mut()
       .zip(&self.canvas)
-      .map(|(pixel, colour)| {
+      .for_each(|(pixel, colour)| {
         *pixel = (*colour).into();
-      })
-      .count();
+      });
 
     img
   }

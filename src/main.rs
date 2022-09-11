@@ -88,9 +88,9 @@ fn chapter_11() {
       sphere.transform = Matrix4x4::translation(0.8, 0.1, 4.0) * Matrix4x4::scale(0.5, 0.5, 0.5);
       sphere.material = Material {
         pattern: Pattern::solid((0.3, 0.4, 0.7).into()),
-        diffuse: 0.0,
-        specular: 0.3,
-        reflective: 0.5,
+        diffuse: 0.1,
+        specular: 0.9,
+        reflective: 0.9,
         ..Default::default()
       };
       sphere
@@ -108,15 +108,21 @@ fn chapter_11() {
   };
 
   let camera = {
-    let mut camera = Camera::new(2000, 1500, PI / 6.0);
+    let mut camera = Camera::new(1920, 1080, PI / 6.0);
     camera.set_transform(Matrix4x4::view_transform(
-      (0.0, 6.0, -11.0),
-      (-0.2, 1.5, 0.0),
+      (-1.5, 6.0, -5.0),
+      (-0.5, 1.5, 0.0),
       (0.0, 1.0, 0.0),
     ));
     camera
   };
 
-  let canvas = camera.render(&world);
-  canvas.to_image().save("chapter_11.png").unwrap();
+  eprintln!("start time: {}\n", chrono::Utc::now().to_rfc2822());
+  let start = std::time::Instant::now();
+  let img = camera.render_img(&world);
+  eprintln!("\nelapsed: {:.2?}\n", std::time::Instant::now() - start);
+  eprintln!("saving..");
+  img.save("chapter_11_fhd.png").unwrap();
+  eprintln!("done.");
+  eprintln!("\ntotal time: {:.2?}", std::time::Instant::now() - start);
 }

@@ -1,6 +1,6 @@
 use crate::*;
 
-pub static MAX_RECURSION_DEPTH: usize = 5;
+pub static MAX_RECURSION_DEPTH: usize = 3;
 
 pub struct World {
   pub objects: Vec<Box<dyn Object>>,
@@ -79,7 +79,7 @@ impl World {
     let reflect_ray = Ray::new(computations.over_position, computations.reflect);
     let colour = self._colour_at(reflect_ray, remaining - 1);
 
-    colour * computations.object.material().reflective
+    colour.clamp(0.0, 1.0) * computations.object.material().reflective
   }
 }
 
