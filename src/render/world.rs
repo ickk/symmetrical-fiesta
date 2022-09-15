@@ -1,6 +1,6 @@
 use crate::*;
 
-pub static MAX_RECURSION_DEPTH: usize = 3;
+pub static MAX_RECURSION_DEPTH: usize = 5;
 
 pub struct World {
   pub objects: Vec<Box<dyn Object>>,

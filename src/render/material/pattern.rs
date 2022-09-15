@@ -91,8 +91,8 @@ pub enum PatternType {
 
 impl Clone for PatternType {
   fn clone(&self) -> PatternType {
-    match self {
-      Perlin(perlin, factor, pattern) => PatternType::Perlin(
+    match *self {
+      Perlin(ref perlin, factor, ref pattern) => PatternType::Perlin(
         PerlinNoise2D::new(
           perlin.get_octaves(),
           perlin.get_amplitude(),
@@ -103,15 +103,15 @@ impl Clone for PatternType {
           perlin.get_bias(),
           perlin.get_seed(),
         ),
-        *factor,
+        factor,
         pattern.clone(),
       ),
-      Solid(c) => Solid(*c),
+      Solid(c) => Solid(c),
       Test => Test,
-      Stripe(a, b) => Stripe(*a, *b),
-      Gradient(a, b) => Gradient(*a, *b),
-      Ring(a, b) => Ring(*a, *b),
-      Checkers(a, b) => Checkers(*a, *b),
+      Stripe(a, b) => Stripe(a, b),
+      Gradient(a, b) => Gradient(a, b),
+      Ring(a, b) => Ring(a, b),
+      Checkers(a, b) => Checkers(a, b),
     }
   }
 }
@@ -127,8 +127,8 @@ impl PatternType {
   #[inline]
   pub fn local_colour_at(&self, position: Point) -> Colour {
     let p = position;
-    match self {
-      Solid(c) => *c,
+    match *self {
+      Solid(c) => c,
       Test => Colour {
         red: p.x,
         green: p.y,
@@ -136,33 +136,33 @@ impl PatternType {
       },
       Stripe(a, b) => {
         if p.x.floor() % 2.0 == 0.0 {
-          *a
+          a
         } else {
-          *b
+          b
         }
       }
       Gradient(a, b) => {
         if p.x.floor() % 2.0 == 0.0 {
-          *a + (*b - *a) * (p.x - p.x.floor())
+          a + (b - a) * (p.x - p.x.floor())
         } else {
-          *b + (*a - *b) * (p.x - p.x.floor())
+          b + (a - b) * (p.x - p.x.floor())
         }
       }
       Ring(a, b) => {
         if (p.x * p.x + p.z * p.z).sqrt().floor() % 2.0 == 0.0 {
-          *a
+          a
         } else {
-          *b
+          b
         }
       }
       Checkers(a, b) => {
         if (p.x.floor() + p.y.floor() + p.z.floor()) % 2.0 == 0.0 {
-          *a
+          a
         } else {
-          *b
+          b
         }
       }
-      Perlin(perlin_obj, factor, pattern) => {
+      Perlin(ref perlin_obj, factor, ref pattern) => {
         let perturbation_x = perlin_obj.get_noise(p.x as f64, p.y as f64) as f32 * factor;
         let perturbation_y = perlin_obj.get_noise(p.y as f64, p.z as f64) as f32 * factor;
         let perturbation_z = perlin_obj.get_noise(p.z as f64, p.x as f64) as f32 * factor;

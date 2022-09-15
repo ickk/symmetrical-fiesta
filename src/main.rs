@@ -108,7 +108,7 @@ fn chapter_11() {
   };
 
   let camera = {
-    let mut camera = Camera::new(1920, 1080, PI / 6.0);
+    let mut camera = Camera::new(800, 566, PI / 6.0);
     camera.set_transform(Matrix4x4::view_transform(
       (-1.5, 6.0, -5.0),
       (-0.5, 1.5, 0.0),
@@ -122,7 +122,7 @@ fn chapter_11() {
   let img = camera.render_img(&world);
   eprintln!("\nelapsed: {:.2?}\n", std::time::Instant::now() - start);
   eprintln!("saving..");
-  img.save("chapter_11_fhd.png").unwrap();
+  img.save("image.png").unwrap();
   eprintln!("done.");
   eprintln!("\ntotal time: {:.2?}", std::time::Instant::now() - start);
 }
